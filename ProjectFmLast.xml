@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>
+    clock t;
+
+    bool verified = true;
+    bool cabinBaggage = false;
+    bool checkInCompleted = false;
+    bool errorDetected = false;
+    bool tagValid = true;
+    bool overweight = false;
+    bool BaggageAccept = false;
+    bool baggageInfo = true;
+    bool doc = true;
+    bool eligibility = true;
+    bool kioskverify = true;
+    bool boardingPassPrint = false;
+    bool checkInConfirm = true;
+
+    chan startKiosk;
+    chan goBagDrop;
+    chan bagAccepted;
+    chan PassAssistance; 
+    chan verify;
+    chan cabinBag;
+    chan boardingPass;
+    chan checkIn;
+    
+
+
+
+
+</declaration>
+	<template>
+		<name>Passenger</name>
+		<location id="id0" x="-1515" y="-645">
+			<name x="-1532" y="-679">Arrive</name>
+		</location>
+		<location id="id1" x="-1371" y="-645">
+			<name x="-1404" y="-679">IdentityVerify</name>
+		</location>
+		<location id="id2" x="-1540" y="-416">
+			<name x="-1625" y="-408">BaggageCheck</name>
+		</location>
+		<location id="id3" x="-1294" y="-416">
+			<name x="-1328" y="-450">AtBagDrop</name>
+		</location>
+		<location id="id4" x="-1404" y="-314">
+			<name x="-1414" y="-348">Exit</name>
+		</location>
+		<location id="id5" x="-1132" y="-416">
+			<name x="-1183" y="-450">ConsultAssistance</name>
+		</location>
+		<location id="id6" x="-1370" y="-552">
+			<name x="-1353" y="-560">ViewBookDetails</name>
+		</location>
+		<location id="id7" x="-1453" y="-484">
+			<name x="-1430" y="-493">boardPass</name>
+		</location>
+		<location id="id8" x="-1565" y="-552">
+			<name x="-1625" y="-586">checkInConfirmation</name>
+		</location>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-1735" y="-484">!checkInConfirm</label>
+			<nail x="-1752" y="-314"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-1498" y="-569">checkIn!</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-1514" y="-544">checkInConfirm</label>
+			<label kind="synchronisation" x="-1472" y="-518">boardingPass!</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-1276" y="-671">!kioskverify</label>
+			<nail x="-1030" y="-646"/>
+			<nail x="-1030" y="-314"/>
+			<nail x="-1378" y="-314"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id2"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-1353" y="-611">verify?</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-1260" y="-433">PassAssistance?</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-1353" y="-365">BaggageAccept</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-1574" y="-374">cabinBaggage</label>
+			<label kind="synchronisation" x="-1523" y="-357">cabinBag!</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-1464" y="-416">!cabinBaggage</label>
+			<label kind="synchronisation" x="-1455" y="-441">goBagDrop!</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-1481" y="-662">startKiosk!</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">KioskCheckIn</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id9" x="-706" y="-467">
+			<name x="-816" y="-501">IdentifyPassenger</name>
+		</location>
+		<location id="id10" x="-501" y="-433">
+			<name x="-544" y="-467">RetrieveBooking</name>
+		</location>
+		<location id="id11" x="-323" y="-433">
+			<name x="-366" y="-467">ReviewModifyBooking</name>
+			<label kind="invariant" x="-349" y="-416">t &lt;= 300</label>
+		</location>
+		<location id="id12" x="-442" y="-145">
+			<name x="-416" y="-153">Completed</name>
+		</location>
+		<location id="id13" x="-697" y="-255">
+			<name x="-816" y="-264">ConfirmCheckIn</name>
+		</location>
+		<location id="id14" x="-935" y="-467">
+			<name x="-945" y="-501">Idle</name>
+		</location>
+		<location id="id15" x="-612" y="-595">
+			<name x="-595" y="-612">Error</name>
+		</location>
+		<location id="id16" x="-816" y="-391">
+			<name x="-935" y="-399">VerifyTravelDoc</name>
+		</location>
+		<location id="id17" x="-817" y="-298">
+			<name x="-927" y="-315">CheckEligibility</name>
+		</location>
+		<location id="id18" x="-637" y="-145">
+			<name x="-680" y="-128">ClearSession</name>
+		</location>
+		<location id="id19" x="-400" y="-264">
+			<name x="-425" y="-298">BoardingPass</name>
+		</location>
+		<init ref="id14"/>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id18"/>
+			<label kind="guard" x="-663" y="-213">!checkInConfirm</label>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-604" y="-255">boardingPass?</label>
+			<nail x="-672" y="-255"/>
+		</transition>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id15"/>
+			<label kind="guard" x="-799" y="-374">!eligibility</label>
+			<label kind="assignment" x="-603" y="-544">errorDetected = true</label>
+			<nail x="-671" y="-399"/>
+		</transition>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id15"/>
+			<label kind="guard" x="-773" y="-416">!doc</label>
+			<label kind="assignment" x="-603" y="-561">errorDetected = true</label>
+			<nail x="-722" y="-391"/>
+		</transition>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-527" y="-204">cabinBag?</label>
+			<nail x="-467" y="-230"/>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id14"/>
+			<label kind="guard" x="-943" y="-187">t &lt;= 60</label>
+			<label kind="assignment" x="-1054" y="-230">verified = false,
+checkInCompleted = false,
+doc = false,
+eligibility = false,
+errorDetected = false</label>
+			<nail x="-1029" y="-247"/>
+			<nail x="-1029" y="-247"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id18"/>
+		</transition>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-655" y="-408">eligibility</label>
+			<label kind="synchronisation" x="-646" y="-374">verify!</label>
+		</transition>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id17"/>
+			<label kind="guard" x="-850" y="-357">doc</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id16"/>
+			<label kind="guard" x="-807" y="-450">verified</label>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id14"/>
+			<label kind="assignment" x="-875" y="-586">kioskverify = false,
+errorDetected = false,
+t = 0</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id15"/>
+			<label kind="guard" x="-722" y="-544">!verified</label>
+			<label kind="assignment" x="-603" y="-578">errorDetected = true</label>
+		</transition>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-416" y="-204">bagAccepted?</label>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-552" y="-374">checkIn?</label>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id11"/>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-859" y="-484">startKiosk?</label>
+			<label kind="assignment" x="-850" y="-459">t = 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>SelfServiceBagDrop </name>
+		<location id="id20" x="-679" y="-161">
+			<name x="-705" y="-195">Waiting</name>
+		</location>
+		<location id="id21" x="-518" y="-161">
+			<name x="-543" y="-195">ScanBag</name>
+			<label kind="invariant" x="-543" y="-212">t &lt;= 120</label>
+		</location>
+		<location id="id22" x="-645" y="-76">
+			<name x="-688" y="-59">WeighBag</name>
+			<label kind="invariant" x="-679" y="-42">t &lt;= 120</label>
+		</location>
+		<location id="id23" x="-433" y="17">
+			<name x="-475" y="25">BaggageInfoVerify</name>
+		</location>
+		<location id="id24" x="-374" y="-161">
+			<name x="-399" y="-195">BagError</name>
+		</location>
+		<location id="id25" x="-212" y="-161">
+			<name x="-246" y="-195">Assistance</name>
+		</location>
+		<location id="id26" x="-212" y="17">
+			<name x="-246" y="26">BagAccept</name>
+		</location>
+		<init ref="id20"/>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id26"/>
+			<label kind="guard" x="-365" y="-26">baggageInfo</label>
+			<label kind="synchronisation" x="-373" y="-43">bagAccepted!</label>
+			<label kind="assignment" x="-399" y="-8">BaggageAccept = true</label>
+		</transition>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id24"/>
+			<label kind="guard" x="-526" y="-119">overweight</label>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-348" y="-178">PassAssistance!</label>
+		</transition>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id23"/>
+			<label kind="guard" x="-552" y="-59">!overweight</label>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id24"/>
+			<label kind="guard" x="-476" y="-186">!tagValid</label>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id22"/>
+			<label kind="guard" x="-637" y="-135">tagValid</label>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-628" y="-186">goBagDrop?</label>
+			<label kind="assignment" x="-627" y="-161">t = 0</label>
+		</transition>
+	</template>
+	<system>p = Passenger();
+kc = KioskCheckIn();
+bd = SelfServiceBagDrop();
+
+system p,kc, bd;
+</system>
+	<queries>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>
