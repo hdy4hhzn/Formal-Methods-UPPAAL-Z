@@ -20,6 +20,17 @@ Z notation is used to formally specify the system's data structures, states, con
 
 The Z specification was developed and analysed using Community Z Tools (CZT).
 
+## My Contribution
+
+**Role: Project Leader**
+
+- Led the planning, coordination, and integration of the group project.
+- Developed and worked on the formal Z specification using Community Z Tools (CZT).
+- Contributed to modelling system states, data structures, constraints, and kiosk operations.
+- Contributed to UPPAAL modelling and verification of system behaviour.
+- Reviewed and integrated group members' work into the final project.
+- Contributed to system verification, error handling scenarios, and final documentation.
+
 ## Tools
 
 - UPPAAL
