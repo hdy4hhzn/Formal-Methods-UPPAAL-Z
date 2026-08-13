@@ -1,0 +1,204 @@
+﻿─ section GroupProject parents standard_toolkit
+└
+
+─ [PassengerID, BookingID, FlightID, Service, LogEntry]└
+─
+  STATUS ::= idle | verified | modifying | checkedInn | bagDrop | completed | error
+└
+─
+ BAGSTATUS ::= cabinOnly | checked 
+└
+─
+  ERROR::= invalidID | bookingNotFound | overweightBag | unreadableTag | inconsistentBag
+└
+
+┌ KioskSystem
+    passengers    : ℙ PassengerID
+    bookings      : BookingID ⇸ FlightID
+    checkedIn     : ℙ BookingID
+    bagType       : BookingID ⇸ BAGSTATUS
+    extraServices : BookingID ⇸ ℙ Service
+    errors        : ℙ ERROR
+    logs          : seq LogEntry
+    status        : STATUS
+|
+  checkedIn ⊆ dom bookings
+  dom bagType ⊆ dom bookings
+  dom extraServices ⊆ dom bookings
+  status = completed ⇒ errors = ∅
+  status = bagDrop ⇒ bagType ≠ ∅
+  status = idle ⇒ passengers = ∅ ∧ bookings = ∅
+└ 
+
+┌ InitKioskSystem
+  KioskSystem
+|
+    passengers = ∅
+    bookings = ∅
+    checkedIn = ∅
+    bagType = ∅
+    extraServices = ∅
+    errors = ∅
+    logs = ⟨ ⟩
+    status = idle
+└
+  
+┌ VerifyPassenger
+    ΔKioskSystem
+    p? : PassengerID
+|
+    status = idle
+    passengers′= passengers ∪ { p? }
+    status′= verified
+    bookings′= bookings
+    checkedIn′ = checkedIn
+    bagType′ = bagType
+    extraServices′ = extraServices
+    errors′ = errors
+    logs′= logs
+└
+
+
+┌ RetrieveBooking
+    ΔKioskSystem
+    b? : BookingID
+    f? : FlightID
+|
+    status = verified
+    bookings′ = bookings ⊕ { b? ↦ f? }
+    status′= modifying
+    passengers′= passengers
+    checkedIn′= checkedIn
+    bagType′ = bagType
+    extraServices′ = extraServices
+    errors′= errors
+    logs′ = logs
+└
+
+┌ ModifyBooking
+  ΔKioskSystem
+    b?  : BookingID
+    s?  : ℙ Service
+    bt? : BAGSTATUS
+|
+    status = modifying
+    b? ∈ dom bookings
+    extraServices′= extraServices ⊕ { b? ↦ s? }
+    bagType′ = bagType ⊕ { b? ↦ bt? }
+    status′ = modifying
+    passengers′= passengers
+    bookings′= bookings
+    checkedIn′= checkedIn
+    errors′= errors
+    logs′= logs
+└
+
+┌ ConfirmCheckIn
+ ΔKioskSystem
+ b? : BookingID
+|
+    status = modifying
+    b? ∈ dom bookings
+    checkedIn′= { b? }
+    status′ = checkedInn 
+    
+    passengers′ = passengers
+    bookings′= bookings
+    bagType′= bagType
+    extraServices′= extraServices
+    errors′= errors
+    logs′= logs
+└
+
+┌  ProceedToSecurity
+  ΔKioskSystem
+  b? : BookingID
+|
+    status = checkedInn
+    bagType b? = cabinOnly
+    status′ = completed
+    
+    passengers′ = passengers
+    bookings′ = bookings
+    checkedIn′= checkedIn
+    bagType′ = bagType
+    extraServices′= extraServices
+    errors′= errors
+    logs′= logs
+└
+
+┌ VerifyBaggage
+  ΔKioskSystem
+   b? : BookingID
+|
+    status = checkedInn
+    bagType b? = checked
+    status′= bagDrop
+    passengers′= passengers
+    bookings′= bookings
+    checkedIn′ = checkedIn
+    bagType′ = bagType
+    extraServices′= extraServices
+    errors′ = errors
+    logs′ = logs
+└
+
+┌ HandleError
+ ΔKioskSystem
+ e? : ERROR
+|
+  status ≠ completed
+    errors′= errors ∪ { e? }
+    status′ = error
+    passengers′= passengers
+    bookings′ = bookings
+    checkedIn′= checkedIn
+    bagType′= bagType
+    extraServices′ = extraServices
+    logs′= logs
+└
+
+┌ ShowItinerary
+  ΔKioskSystem
+|
+    status = bagDrop
+    status′ = completed
+    passengers′ = passengers
+    bookings′= bookings
+    checkedIn′= checkedIn
+    bagType′= bagType
+    extraServices′ = extraServices
+    errors′ = errors
+    logs′ = logs
+└
+
+┌ LogUsageData
+   ΔKioskSystem
+    l? : LogEntry
+|
+  logs′= logs ⌢ ⟨ l? ⟩
+    passengers′ = passengers
+    bookings′= bookings
+    checkedIn′= checkedIn
+    bagType′= bagType
+    extraServices′= extraServices
+    errors′ = errors
+    status′= status
+└
+
+┌ EndSession
+  ΔKioskSystem
+|
+    status = completed
+    passengers′= ∅
+    bookings′ = ∅
+    checkedIn′ = ∅
+    bagType′= ∅
+    extraServices′= ∅
+    errors′ = ∅
+    logs′= logs
+    status′ = idle
+└
+
+
+
